@@ -2036,7 +2036,7 @@ const Step1CompanyCategory: React.FC<Step1CompanyCategoryProps> = ({
       setVerifyingGST(true);
 
       try {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NTU0NjEwNiwianRpIjoiNTNkODRmMTMtNTNjYS00MzhiLWFhZTItMjM0OTE1OGY4N2I0IiwidHlwZSI6ImFjY2VzcyIsImlkZW50aXR5IjoiZGV2LmRyb25ldHZAc3VyZXBhc3MuaW8iLCJuYmYiOjE3NzU1NDYxMDYsImV4cCI6MTc3ODEzODEwNiwiZW1haWwiOiJkcm9uZXR2QHN1cmVwYXNzLmlvIiwidGVuYW50X2lkIjoibWFpbiIsInVzZXJfY2xhaW1zIjp7InNjb3BlcyI6WyJ1c2VyIl19fQ.e1702x4ik39KgVqIB0kEjM5BjXuIH0uU34UMlgZsHcY";
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc3NzI3MzM3OCwianRpIjoiZTIwM2Q1YmUtMDhkMS00ZGFhLWIyNmItYWM2MGFkNjNiNzkyIiwidHlwZSI6ImFjY2VzcyIsImlkZW50aXR5IjoiZGV2LmRyb25ldHZAc3VyZXBhc3MuaW8iLCJuYmYiOjE3NzcyNzMzNzgsImV4cCI6MTc3NzcwNTM3OCwiZW1haWwiOiJkcm9uZXR2QHN1cmVwYXNzLmlvIiwidGVuYW50X2lkIjoibWFpbiIsInVzZXJfY2xhaW1zIjp7InNjb3BlcyI6WyJ1c2VyIl19fQ.BQ2x4FBIQl-N59_ReraW-JNOyr8IIlDssqlUik0vOpU";
 
         const gstResponse = await axios.post(
           "https://sandbox.surepass.app/api/v1/corporate/gstin-advanced",
@@ -2118,15 +2118,18 @@ const Step1CompanyCategory: React.FC<Step1CompanyCategoryProps> = ({
 
           if (verifiedData.companyName) {
             updates.companyName = verifiedData.companyName;
+            updates.gstCompanyName = verifiedData.companyName;
           }
 
           if (verifiedData.legalName) {
             updates.legalName = verifiedData.legalName;
+            updates.gstLegalName = verifiedData.legalName;
           }
 
           // Update PAN number from GST API response
           if (verifiedData.pan) {
             updates.panNumber = verifiedData.pan;
+            updates.gstPan = verifiedData.pan;
             setPanNumber(verifiedData.pan);
             // Also update social links PAN
             updates.socialLinks = {
@@ -2138,6 +2141,7 @@ const Step1CompanyCategory: React.FC<Step1CompanyCategoryProps> = ({
           // Update Business Entity Type
           if (verifiedData.businessEntityType) {
             updates.businessField = verifiedData.businessEntityType;
+            updates.gstBusinessType = verifiedData.businessEntityType;
           }
 
           // Update Nature of Business
@@ -2146,9 +2150,64 @@ const Step1CompanyCategory: React.FC<Step1CompanyCategoryProps> = ({
           }
 
           // Parse and sync Year Established (Date of Incorporation)
-          // New API returns YYYY-MM-DD
           if (verifiedData.registrationDate) {
             updates.yearEstablished = verifiedData.registrationDate;
+            updates.gstRegistrationDate = verifiedData.registrationDate;
+          }
+
+          // NEW: Map additional fields from Surepass Response
+          if (fullAddress) {
+            updates.officeAddress = fullAddress;
+            updates.gstAddress = fullAddress;
+            updates.directorAddress = fullAddress;
+          }
+
+          if (extractedState) {
+            updates.state = extractedState;
+            updates.gstState = extractedState;
+            updates.country = "India"; // Default to India if we have a state from GST
+          }
+
+          if (extractedPincode) {
+            updates.postalCode = extractedPincode;
+            updates.gstPincode = extractedPincode;
+          }
+
+          // Try to extract city from address parts
+          if (fullAddress) {
+            const parts = fullAddress.split(",").map(p => p.trim());
+            // Usually city is 3rd from last (Pincode, State, City)
+            if (parts.length >= 3) {
+              const city = parts[parts.length - 3];
+              if (city && !city.match(/\d/)) { // Ensure it's not a number/pincode
+                updates.city = city;
+              }
+            }
+          }
+
+          // Map contact details to Support and Director fields
+          if (apiData.contact_details?.principal?.email) {
+            updates.supportEmail = apiData.contact_details.principal.email;
+            updates.directorEmail = apiData.contact_details.principal.email;
+          }
+          if (apiData.contact_details?.principal?.mobile) {
+            updates.supportContactNumber = apiData.contact_details.principal.mobile;
+            updates.directorPhone = apiData.contact_details.principal.mobile;
+          }
+
+          // Map first promoter to Director Name
+          if (Array.isArray(apiData.promoters) && apiData.promoters.length > 0) {
+            const firstPromoter = apiData.promoters[0];
+            if (firstPromoter) {
+              // Clean extra spaces and title case if it's all caps
+              let cleanName = firstPromoter.replace(/\s+/g, ' ').trim();
+              if (cleanName === cleanName.toUpperCase()) {
+                cleanName = cleanName.toLowerCase().split(' ').map(word => 
+                  word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+              }
+              updates.directorName = cleanName;
+            }
           }
 
           if (Object.keys(updates).length > 0) {
