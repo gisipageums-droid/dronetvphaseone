@@ -113,7 +113,7 @@ const AboutPage = () => {
               </div>
             </div>
             <div className="bg-gray-50 rounded-xl border border-gray-200 p-8">
-              <img src="/images/logo.png" alt="Drone Technology" className="w-full h-52 object-contain rounded-xl mb-6" />
+              <img src="/images/Drone_tv_black.png" alt="Drone TV" className="w-full h-52 object-contain rounded-xl mb-6" />
               <div className="text-center">
                 <h3 className="text-lg font-bold text-gray-900 mb-3">Shaping Tomorrow's Technology</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">Through comprehensive education and industry partnerships, we're building the foundation for the next generation of drone innovations.</p>

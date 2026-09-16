@@ -158,9 +158,9 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex-shrink-0 group">
             <img
-              src="/images/Drone tv .in.png"
+              src="/images/Drone_tv_black.png"
               alt="Drone TV"
-              className="w-20 h-20 cursor-pointer group-hover:scale-110 transition-all duration-300"
+              className="w-28 h-auto object-contain cursor-pointer group-hover:scale-110 transition-all duration-300"
               onClick={() => handleNavigation("/")}
             />
           </div>

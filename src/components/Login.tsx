@@ -231,9 +231,9 @@ export default function Login() {
               <div className="flex items-center justify-between px-5 mb-6">
                 <h2 className="pt-5 mb-4 text-2xl font-bold">Sign In</h2>
                 <img
-                  src="./images/Drone tv .in.png"
-                  alt="logo"
-                  className="h-[5.5rem] w-[6rem]"
+                  src="/images/Drone_tv_black.png"
+                  alt="Drone TV"
+                  className="h-auto w-24 object-contain"
                 />
               </div>
               <form onSubmit={handleLoginSubmit}>
@@ -353,7 +353,7 @@ export default function Login() {
             <div className="w-full max-w-md px-8 pb-5 bg-white rounded-lg shadow-lg">
               <div className="flex items-center justify-between px-5 mb-3">
                 <h2 className="pt-5 mb-4 text-2xl font-bold">Sign Up</h2>
-                <img src="./images/logo.png" alt="logo" className="h-10 w-25" />
+                <img src="/images/Drone_tv_black.png" alt="Drone TV" className="h-auto w-24 object-contain" />
               </div>
 
               <form onSubmit={handleSignUpSubmit}>
